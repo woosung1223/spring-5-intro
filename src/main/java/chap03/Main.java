@@ -15,7 +15,9 @@ public class Main {
     private static ApplicationContext applicationContext;
 
     static {
-        applicationContext = new AnnotationConfigApplicationContext(AppContext.class);
+        applicationContext = new AnnotationConfigApplicationContext(
+                AppContext1.class, AppContext2.class
+        );
     }
 
     public static void main(String[] args) {
