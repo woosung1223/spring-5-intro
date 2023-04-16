@@ -3,6 +3,8 @@ package chap03;
 import chap03.service.ChangePasswordService;
 import chap03.service.MemberRegisterService;
 import chap03.service.RegisterRequest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,10 +12,15 @@ import java.util.Scanner;
 
 public class Main {
 
+    private static ApplicationContext applicationContext;
+
+    static {
+        applicationContext = new AnnotationConfigApplicationContext(AppContext.class);
+    }
+
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
-        Assembler assembler = new Assembler();
 
         label:
         while (true) {
@@ -24,18 +31,20 @@ public class Main {
                 case "exit":
                     break label;
                 case "new":
-                    registerProcess(arguments, assembler);
+                    registerProcess(arguments);
                     break;
                 case "change":
-                    changeProcess(arguments, assembler);
+                    changeProcess(arguments);
                     break;
             }
+            printProcess();
         }
         System.out.println("시스템을 종료합니다.");
     }
 
-    private static void registerProcess(final List<String> arguments, final Assembler assembler) {
-        MemberRegisterService memberRegisterService = assembler.getMemberRegisterService();
+    private static void registerProcess(final List<String> arguments) {
+        MemberRegisterService memberRegisterService = applicationContext.getBean(
+                "memberRegisterService", MemberRegisterService.class);
 
         RegisterRequest registerRequest = new RegisterRequest();
         registerRequest.setEmail(arguments.get(1));
@@ -47,8 +56,10 @@ public class Main {
         System.out.println("회원가입을 완료했습니다.");
     }
 
-    private static void changeProcess(final List<String> arguments, final Assembler assembler) {
-        ChangePasswordService changePasswordService = assembler.getChangePasswordService();
+    private static void changeProcess(final List<String> arguments) {
+        ChangePasswordService changePasswordService = applicationContext.getBean(
+                "changePasswordService", ChangePasswordService.class
+        );
 
         changePasswordService.changePassword(
                 arguments.get(1),
@@ -58,4 +69,10 @@ public class Main {
         System.out.println("암호를 변경했습니다.");
     }
 
+    private static void printProcess() {
+        MemberPrinter memberPrinter = applicationContext.getBean(
+                "memberPrinter", MemberPrinter.class
+        );
+        memberPrinter.print();
+    }
 }
